@@ -1,0 +1,62 @@
+services:
+    app:
+        container_name: app
+        build:
+            context: .
+            dockerfile:  docker/Dockerfile
+        restart: unless-stopped
+        working_dir: /var/www
+        ports:
+        - "9000:9000"
+        volumes:
+            - ./:/var/www
+        depends_on:
+            - db
+            - redis
+        networks:
+            - tray-users-api  
+    nginx:
+      container_name: nginx
+      image: nginx:latest
+      ports:
+        - "8000:80"
+      volumes:
+        - ./:/var/www
+        - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      depends_on:
+        - app
+      networks:
+        - tray-users-api   
+
+    # db mysql
+    db:
+        container_name: mysql8
+        image: mysql:8.0
+        restart: unless-stopped
+        environment:
+            MYSQL_DATABASE: ${DB_DATABASE}
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+            MYSQL_ROOT_HOST: "%"
+        volumes:
+            - db_data:/var/lib/mysql
+        ports:
+            - "3306:3306"
+        networks:
+            - tray-users-api
+
+       # redis
+    redis:
+        container_name: redis
+        image: redis:6.2-alpine
+        ports:
+          - "6379:6379"
+        networks:
+          - tray-users-api
+
+volumes:
+  db_data:
+  db_test_data:
+  
+networks:
+    tray-users-api:
+        driver: bridge

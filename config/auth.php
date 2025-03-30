@@ -112,4 +112,9 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    'google_auth' => [
+        "credentials_file_name" => env('GOOGLE_FILE_NAME_CREDENTIALS', 'google-credentials.json'),
+        "redirect_uri"          => env('GOOGLE_FILE_NAME_CREDENTIALS', 'http://localhost:8000/api/auth/google-callback'),
+    ]
+
 ];

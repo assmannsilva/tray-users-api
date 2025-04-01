@@ -47,9 +47,7 @@ class GoogleAuthController extends Controller
     ) {
         try {   
             $token = $google_auth_service->getNewToken($request->get('code'));
-            $user_info = $google_auth_service->getUserInfo($token);
             $user = $user_service->create(
-                $user_info->email,
                 $token,
                 $user_repository
             );

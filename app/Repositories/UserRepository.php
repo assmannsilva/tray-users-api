@@ -15,4 +15,16 @@ class UserRepository {
             "google_token" => $token
         ]);
     }
+
+    /**
+     * Cria um novo usuário ou atualiza o token, caso o email já exista
+     * @param string $email
+     * @param array $update_data
+     * @return User
+     */
+    public function update(User $user, array $update_data) : User {
+        $user->update($update_data);
+        $user->refresh();
+        return $user;
+    }
 }

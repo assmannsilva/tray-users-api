@@ -23,4 +23,32 @@ class UserService {
          */
         return $user_repository->create($token);
     }
+
+    /**
+     * Completa o registro do usuário
+     * @param User $user
+     * @param UserRepository $user_repository
+     * @param string $name
+     * @param string $birth_date
+     * @param string $cpf
+     * @return User
+     */
+    public function completeRegistration(
+        User $user,
+        UserRepository $user_repository,
+        string $name,
+        string $birth_date,
+        string $cpf
+    ): User {
+        $user = $user_repository->update($user,[
+            "name" => $name,
+            "birth_date" => $birth_date,
+            "cpf" => $cpf
+        ]);
+        //SendEmail
+        
+        return $user;
+    }
+
+
 }

@@ -45,14 +45,17 @@ class GoogleAuthController extends Controller
         UserService $user_service,
         UserRepository $user_repository
     ) {
-        try {   
-            $token = $google_auth_service->getNewToken($request->get('code'));
-            $user = $user_service->create(
-                $token,
-                $user_repository
+        try {
+            if($request->exists("error")) return; //redirect;
+
+            $token = $google_auth_service->getNewToken(
+                $request->get('code'),
+                $request->get("state")
             );
 
-            return \response()->json($user,201);
+            $user = $user_service->create($token,$user_repository);
+
+            return ; //redirect
         } 
         catch (InvalidGoogleAuthTokenException $exception) {
             return \response()->json([

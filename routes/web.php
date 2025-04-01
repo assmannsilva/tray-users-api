@@ -1,9 +1,8 @@
 <?php
 
+use App\Http\Controllers\GoogleAuthController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/teste', function () {
-    return response()->json([
-        'message' => 'Hello World!',
-    ]);
-});
+
+Route::get('/google-callback',  [GoogleAuthController::class, 'googleCallback'])
+    ->name('google.auth.google-callback');

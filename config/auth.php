@@ -114,7 +114,7 @@ return [
 
     'google_auth' => [
         "credentials_file_name" => env('GOOGLE_FILE_NAME_CREDENTIALS', 'google-credentials.json'),
-        "redirect_uri"          => env('GOOGLE_FILE_NAME_CREDENTIALS', 'http://localhost:8000/api/auth/google-callback'),
+        "redirect_uri"          => env('GOOGLE_FILE_NAME_CREDENTIALS', 'http://localhost:8000/google-callback'),
     ]
 
 ];

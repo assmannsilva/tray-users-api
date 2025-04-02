@@ -1,8 +1,11 @@
 <?php
 namespace App\Services;
 
+use App\Jobs\SendMailCompleteRegistration;
+use App\Mail\CompleteRegistration;
 use App\Models\User;
 use App\Repositories\UserRepository;
+use Illuminate\Support\Facades\Mail;
 
 class UserService {
 
@@ -45,9 +48,23 @@ class UserService {
             "birth_date" => $birth_date,
             "cpf" => $cpf
         ]);
-        //SendEmail
-        
+
+        /*
+            Sim, dava pra enviar o email usando a função queue do Mail facade somente,
+            mas eu gostaria de chamar a API do Google na fila
+            e demonstrar o uso de Jobs também
+        */
+        SendMailCompleteRegistration::dispatch($user);
         return $user;
+    }
+
+    public function sendMailCompleteRegistration(
+        GoogleAuthService $google_auth_service,
+        User $user
+    ) {
+        $token = $user->google_token;
+        $user_info = $google_auth_service->getUserInfo($token);
+        Mail::to($user_info->email)->send(new CompleteRegistration);
     }
 
 

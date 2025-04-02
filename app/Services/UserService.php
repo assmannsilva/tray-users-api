@@ -47,7 +47,7 @@ class UserService {
     ): User {
         $user = $user_repository->update($user,[
             "name" => $name,
-            "birth_date" => $birth_date,
+            "birthday" => $birth_date,
             "cpf" => $cpf
         ]);
 

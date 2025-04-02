@@ -12,4 +12,5 @@ Route::prefix('auth')->controller(GoogleAuthController::class)->group(function (
 
 Route::prefix('users')->controller(UserController::class)->group(function () {
     Route::get('/search', 'search')->name('user.search');
+    Route::post('{user}/complete-registration', 'completeRegistration')->name('user.complete-registration');
 });

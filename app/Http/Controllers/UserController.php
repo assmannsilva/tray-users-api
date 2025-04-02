@@ -30,7 +30,7 @@ class UserController {
                 $user,
                 $user_repository,
                 $request->input("name"),
-                $request->input("birth_date"),
+                $request->input("birthday"),
                 $request->input("cpf"),
             );
             return \response()->json($updated_user,200);

@@ -24,6 +24,10 @@ class User extends Authenticatable
         'cpf',
     ];
 
+    protected $hidden = [
+        "google_token",
+    ];
+
 
     protected static function booted()
     {

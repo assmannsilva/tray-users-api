@@ -32,7 +32,7 @@ class UserCompleteRegistrationRequest extends FormRequest
         return [
             "cpf" => ['required', 'string', 'size:11', new CpfRule()],
             "name" =>  ['required', 'string', 'min:3', 'max:255', 'regex:/^[\pL\s\-]+$/u'],
-            "birth_date" => ["required","date","before:today"]
+            "birthday" => ["required","date","before:today"]
         ];
     }
 }

@@ -56,7 +56,7 @@ class GoogleAuthController extends Controller
 
             $user = $user_service->create($token,$user_repository);
 
-            return ; //redirect
+            return \redirect("http://localhost/users/{$user->id}/complete-registration");
         } 
         catch (InvalidGoogleAuthException $exception) {
             return \response()->json([

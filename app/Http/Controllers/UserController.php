@@ -9,7 +9,6 @@ use App\Services\UserService;
 use Illuminate\Http\Request;
 use Throwable;
 use Illuminate\Support\Facades\Log;
-
 class UserController {
 
     /**
@@ -40,5 +39,21 @@ class UserController {
             Log::error($th->getMessage(),["trace" => $th->getTrace()]);
             return \response()->json(["error" => "internal error"],500);
         }
-    } 
+    }
+
+    public function search(Request $request, UserService $user_service)
+    {
+        try { 
+            return $user_service->search(
+                $request->query("name"),
+                $request->query("cpf"),
+                $request->query("page")
+            );
+        }
+        catch(Throwable $th) {
+            Log::error($th->getMessage(),["trace" => $th->getTrace()]);
+            return \response()->json(["error" => "internal error"],500);
+        }
+        
+    }
 }

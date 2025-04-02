@@ -5,8 +5,10 @@ use App\Jobs\SendMailCompleteRegistration;
 use App\Mail\CompleteRegistration;
 use App\Models\User;
 use App\Repositories\UserRepository;
+use Illuminate\Contracts\Database\Query\Builder;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
-
+use Illuminate\Support\Facades\DB;
 class UserService {
 
     /**
@@ -65,6 +67,28 @@ class UserService {
         $token = $user->google_token;
         $user_info = $google_auth_service->getUserInfo($token);
         Mail::to($user_info->email)->send(new CompleteRegistration);
+    }
+
+
+    public function search(
+        ?String $search_name,
+        ?String $cpf,
+        ?String $page
+    ) {
+        $cache_key = "user_query_results_name_{$search_name}_cpf_{$cpf}_page_{$page}";
+        $cache_tag = $search_name || $cpf ? "filter_search" : "clean_search";
+        
+        return Cache::tags([$cache_tag])->remember($cache_key,\now()->addMinutes(15), function () use($search_name,$cpf) {
+            return DB::table("users")
+            ->when($search_name, function(Builder $query, string $search_name) {
+                $query->where("name","like","$search_name%");
+            })
+            ->when($cpf, function(Builder $query, string $cpf) {
+                $query->where("cpf","like","$cpf%");
+            })
+            ->orderBy("id","asc")
+            ->simplePaginate(100);
+        });
     }
 
 

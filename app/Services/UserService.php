@@ -77,7 +77,6 @@ class UserService {
     ) {
         $cache_key = "user_query_results_name_{$search_name}_cpf_{$cpf}_page_{$page}";
         $cache_tag = $search_name || $cpf ? "filter_search" : "clean_search";
-        
         return Cache::tags([$cache_tag])->remember($cache_key,\now()->addMinutes(15), function () use($search_name,$cpf) {
             return DB::table("users")
             ->when($search_name, function(Builder $query, string $search_name) {
@@ -87,7 +86,8 @@ class UserService {
                 $query->where("cpf","like","$cpf%");
             })
             ->orderBy("id","asc")
-            ->simplePaginate(100);
+            ->select("name","cpf","birthday","id")
+            ->paginate(100);
         });
     }
 

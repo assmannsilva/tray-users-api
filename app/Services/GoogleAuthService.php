@@ -18,11 +18,11 @@ class GoogleAuthService {
      * Configura o código state para realizar uma checagem posterior no callback_uri
      * @return void
      */
-    private function configureStateCode() 
+    private function configureStateCode(string $uuid) 
     {
-        $state_code = Str::uuid();
-        session(["state_code" => $state_code]);
-        $this->client->setState($state_code);
+        //Fiz dessa forma, pois as sessions não funcionam utilizando APIs
+        cache(["{$uuid}_state" => "state_code"]);
+        $this->client->setState($uuid);
     }
 
     /**
@@ -30,10 +30,11 @@ class GoogleAuthService {
      * Acaba sendo necessário se for usado o state code, senão a chamada do token é inválida
      * @return void
      */
-    private function configureCodeVerifier() 
+    private function configureCodeVerifier($uuid) 
     {
         $google_code_verifier = $this->client->getOAuth2Service()->generateCodeVerifier();
-        session(["google_code_verifier" => $google_code_verifier]);
+        //Fiz dessa forma, pois as sessions não funcionam utilizando APIs
+        cache(["{$uuid}_code_verifier" => $google_code_verifier]);
     }
 
     /**
@@ -44,9 +45,10 @@ class GoogleAuthService {
     {
         $this->client->addScope(Oauth2::USERINFO_EMAIL);
         $this->client->setPrompt('consent');
-
-        $this->configureStateCode();
-        $this->configureCodeVerifier();
+        
+        $uuid = Str::uuid();
+        $this->configureStateCode($uuid);
+        $this->configureCodeVerifier($uuid);
     
         return $this->client->createAuthUrl();
     }
@@ -54,17 +56,17 @@ class GoogleAuthService {
     /**
      * Retorna um novo token do Google
      * @param string $code
-     * @param string $state_code_from_google
+     * @param string $state_code
      * @throws InvalidGoogleAuthException
      * @return string $access_token
      */
-    public function getNewToken(String $code,String $state_code_from_google): string
+    public function getNewToken(String $code,String $state_code): string
     {
-        if(!session("state_code") || session("state_code") != $state_code_from_google) {
+        if(cache("{$state_code}_state") != "state_code") {
             throw new InvalidGoogleAuthException;
         }
-
-        $token = $this->client->fetchAccessTokenWithAuthCode($code,session("google_code_verifier"));
+        
+        $token = $this->client->fetchAccessTokenWithAuthCode($code,cache("{$state_code}_code_verifier"));
         if(!isset($token["access_token"])) throw new InvalidGoogleAuthException;
 
         return $token["access_token"];

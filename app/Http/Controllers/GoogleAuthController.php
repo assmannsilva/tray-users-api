@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\InvalidGoogleAuthException;
 use App\Exceptions\InvalidGoogleAuthTokenException;
 use App\Repositories\UserRepository;
 use App\Services\GoogleAuthService;
@@ -57,7 +58,7 @@ class GoogleAuthController extends Controller
 
             return ; //redirect
         } 
-        catch (InvalidGoogleAuthTokenException $exception) {
+        catch (InvalidGoogleAuthException $exception) {
             return \response()->json([
                 "error" => $exception->getMessage()
             ],422); //TODO: rever código HTTP

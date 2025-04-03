@@ -123,4 +123,11 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    "crypted_user_columns_keys" => [
+        "cpf" => env("SODIUM_CPF_SECRET_KEY"),
+        "cpf_index" => env("SODIUM_CPF_INDEX_KEY"),
+        "name" => env("SODIUM_NAME_SECRET_KEY"),
+        "name_index" => env("SODIUM_NAME_INDEX_KEY"),
+    ]
+
 ];

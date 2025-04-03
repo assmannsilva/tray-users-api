@@ -50,7 +50,7 @@ class GoogleAuthController extends Controller
         UserRepository $user_repository
     ): RedirectResponse|JsonResponse {
         try {
-            if($request->exists("error")) return \redirect("http://localhost/");
+            if($request->exists("error")) return \redirect(\config("app.url"));
 
             $token = $google_auth_service->getNewToken(
                 $request->get('code'),
@@ -59,7 +59,7 @@ class GoogleAuthController extends Controller
 
             $user = $user_service->create($token,$user_repository);
 
-            return \redirect("http://localhost/users/{$user->id}/complete-registration");
+            return \redirect(\config("app.url")."/users/{$user->id}/complete-registration");
         } 
         catch (InvalidGoogleAuthException $exception) {
             return \response()->json([

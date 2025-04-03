@@ -30,7 +30,7 @@ class UserCompleteRegistrationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "cpf" => ['required', 'string', 'size:11', new CpfRule()],
+            "cpf" => ['required', 'string', 'unique:users,cpf', 'size:11', new CpfRule()],
             "name" =>  ['required', 'string', 'min:3', 'max:255', 'regex:/^[\pL\s\-]+$/u'],
             "birthday" => ["required","date","before:today"]
         ];

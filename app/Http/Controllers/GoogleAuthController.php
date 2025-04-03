@@ -47,7 +47,7 @@ class GoogleAuthController extends Controller
         UserRepository $user_repository
     ) {
         try {
-            if($request->exists("error")) return; //redirect;
+            if($request->exists("error")) return \redirect("http://localhost/");
 
             $token = $google_auth_service->getNewToken(
                 $request->get('code'),

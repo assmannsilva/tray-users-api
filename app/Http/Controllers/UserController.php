@@ -41,13 +41,17 @@ class UserController {
         }
     }
 
-    public function search(Request $request, UserService $user_service)
-    {
+    public function search(
+        Request $request,
+        UserService $user_service,
+        UserRepository $user_repository
+    ) {
         try { 
             return $user_service->search(
                 $request->query("name"),
                 $request->query("cpf"),
-                $request->query("page")
+                $request->query("page"),
+                $user_repository
             );
         }
         catch(Throwable $th) {

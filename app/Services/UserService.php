@@ -1,6 +1,7 @@
 <?php
 namespace App\Services;
 
+use App\Helpers\SodiumCrypto;
 use App\Jobs\SendMailCompleteRegistration;
 use App\Mail\CompleteRegistration;
 use App\Models\User;
@@ -69,25 +70,34 @@ class UserService {
         Mail::to($user_info->email)->send(new CompleteRegistration);
     }
 
-
+    
     public function search(
         ?String $search_name,
         ?String $cpf,
-        ?String $page
+        ?String $page,
+        UserRepository $user_repository
     ) {
         $cache_key = "user_query_results_name_{$search_name}_cpf_{$cpf}_page_{$page}";
         $cache_tag = $search_name || $cpf ? "filter_search" : "clean_search";
-        return Cache::tags([$cache_tag])->remember($cache_key,\now()->addMinutes(15), function () use($search_name,$cpf) {
-            return DB::table("users")
-            ->when($search_name, function(Builder $query, string $search_name) {
-                $query->where("name","like","$search_name%");
-            })
-            ->when($cpf, function(Builder $query, string $cpf) {
-                $query->where("cpf","like","$cpf%");
-            })
-            ->orderBy("id","asc")
-            ->select("name","cpf","birthday","id")
-            ->paginate(100);
+
+        $index_key_name = $search_name ? SodiumCrypto::getIndex(
+            $search_name,
+            SodiumCrypto::getCryptKey("app.crypted_user_columns_keys.name_index")
+        ) : null;
+
+        $index_key_cpf = $cpf ? SodiumCrypto::getIndex(
+            $cpf,
+            SodiumCrypto::getCryptKey("app.crypted_user_columns_keys.cpf_index")
+        ) : null;
+
+        return Cache::tags([$cache_tag])->remember(
+            $cache_key,
+            \now()->addMinutes(15), 
+            function () use($index_key_name,$index_key_cpf,$user_repository) {
+            return $user_repository->search(
+                $index_key_cpf,
+                $index_key_name,
+            );
         });
     }
 

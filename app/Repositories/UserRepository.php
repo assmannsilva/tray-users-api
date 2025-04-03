@@ -2,6 +2,7 @@
 namespace App\Repositories;
 
 use App\Models\User;
+use Illuminate\Contracts\Pagination\Paginator;
 
 class UserRepository {
     
@@ -26,5 +27,21 @@ class UserRepository {
         $user->update($update_data);
         $user->refresh();
         return $user;
+    }
+
+    public function search(
+        ?String $cpf_index,
+        ?String $name_index
+    ) : Paginator {
+        return User::query()
+        ->when($cpf_index, fn($query) => $query->where('cpf_index', $cpf_index))
+        ->when($name_index, fn($query) => 
+            $query->where(function ($q) use ($name_index) {
+                $q->where('first_name_index', $name_index)
+                  ->orWhereJsonContains('surname_tokens', $name_index);
+            })
+        )
+        ->paginate(100);
+    
     }
 }

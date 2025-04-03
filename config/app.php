@@ -128,6 +128,8 @@ return [
         "cpf_index" => env("SODIUM_CPF_INDEX_KEY"),
         "name" => env("SODIUM_NAME_SECRET_KEY"),
         "name_index" => env("SODIUM_NAME_INDEX_KEY"),
+        "birthday" => env("SODIUM_BIRTHDAY_SECRET_KEY"),
+        "google_token" => env("SODIUM_GOOGLE_TOKEN_SECRET_KEY"),
     ]
 
 ];

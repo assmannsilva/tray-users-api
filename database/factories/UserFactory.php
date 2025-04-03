@@ -36,7 +36,7 @@ class UserFactory extends Factory
         return [
             'name' => $this->faker->name(),
             'cpf' => $this->faker->unique()->cpf(false),
-            'birthday' => $this->faker->dateTimeBetween('-30 years', '-10 years'),
+            'birthday' => $this->faker->dateTimeBetween('-30 years', '-10 years')->format('Y-m-d'),
             'google_token' => Str::random(10),
         ];
     }

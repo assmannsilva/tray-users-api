@@ -16,7 +16,7 @@ return new class extends Migration
             $table->timestamps();
             $table->binary("google_token");
             $table->binary('name')->nullable();
-            $table->binary("birthday")->nullable();
+            $table->date("birthday")->nullable();
             $table->binary("cpf")->nullable();
             $table->string("cpf_index")->nullable()->unique();
             $table->string("first_name_index")->nullable()->index();

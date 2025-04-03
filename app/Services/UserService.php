@@ -7,6 +7,7 @@ use App\Mail\CompleteRegistration;
 use App\Models\User;
 use App\Repositories\UserRepository;
 use Illuminate\Contracts\Database\Query\Builder;
+use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
@@ -61,6 +62,12 @@ class UserService {
         return $user;
     }
 
+    /**
+     * Envia um email de cadastro concluído para o usuário cadastrado no Google
+     * @param GoogleAuthService $google_auth_service
+     * @param User $user
+     * @return void
+     */
     public function sendMailCompleteRegistration(
         GoogleAuthService $google_auth_service,
         User $user
@@ -70,13 +77,20 @@ class UserService {
         Mail::to($user_info->email)->send(new CompleteRegistration);
     }
 
-    
+    /**
+     * Busca usuários com base no nome ou CPF
+     * @param string|null $search_name
+     * @param string|null $cpf
+     * @param string|null $page
+     * @param UserRepository $user_repository
+     * @return Paginator
+     */
     public function search(
         ?String $search_name,
         ?String $cpf,
         ?String $page,
         UserRepository $user_repository
-    ) {
+    ): Paginator {
         $cache_key = "user_query_results_name_{$search_name}_cpf_{$cpf}_page_{$page}";
         $cache_tag = $search_name || $cpf ? "filter_search" : "clean_search";
 

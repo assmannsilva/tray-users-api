@@ -5,7 +5,11 @@ use App\Helpers\SodiumCrypto;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
 trait HasEncrypt {
-
+    /**
+     * Cria os callables para os atributos criptografados (Laravel fica tentando chamar a função se retorna um Attribute)
+     * @param string $column
+     * @return Array $callables
+     */
     protected function makeEncryptedAttributeCallables(string $column): Array
     {
         return [
@@ -22,6 +26,10 @@ trait HasEncrypt {
         ];
     }
 
+    /**
+     * Realiza a criptografia do index do cpf
+     * @return void
+     */
     protected function encryptCpfIndex(): void
     {
         if($this->cpf === \null) return;
@@ -29,6 +37,10 @@ trait HasEncrypt {
         $this->attributes["cpf_index"] = SodiumCrypto::getIndex($this->cpf, $crypt_index);
     }
 
+    /**
+     * Realiza a criptografia do index do nome
+     * @return void
+     */
     protected function encryptFirstNameIndex(): void
     {
         if($this->name === \null) return;
@@ -40,6 +52,10 @@ trait HasEncrypt {
         $this->attributes["first_name_index"] = SodiumCrypto::getIndex($first_name, $crypt_index);
     }
 
+    /**
+     * Realiza a criptografia dos tokens de sobrenome
+     * @return void
+     */
     protected function encryptSurnameTokens(): void
     {
         if($this->name === \null) return;

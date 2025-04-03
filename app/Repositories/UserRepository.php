@@ -29,6 +29,12 @@ class UserRepository {
         return $user;
     }
 
+    /**
+     * Busca usuários cadastrados no sistema
+     * @param string|null $cpf_index
+     * @param string|null $name_index
+     * @return Paginator
+     */
     public function search(
         ?String $cpf_index,
         ?String $name_index

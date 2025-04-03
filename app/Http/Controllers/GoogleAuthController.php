@@ -3,23 +3,25 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\InvalidGoogleAuthException;
-use App\Exceptions\InvalidGoogleAuthTokenException;
 use App\Repositories\UserRepository;
 use App\Services\GoogleAuthService;
 use App\Services\UserService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Throwable;
 use Illuminate\Support\Facades\Log;
 
 class GoogleAuthController extends Controller
 {
+    const ERROR_MESSAGE = "Erro interno na API";
 
     /**
      * Gera a URL de autenticação do Google
      * @param GoogleAuthService $google_auth_service
      * @return \Illuminate\Http\JsonResponse
      */
-    public function generateToken(GoogleAuthService $google_auth_service)
+    public function generateToken(GoogleAuthService $google_auth_service) : JsonResponse
     {
         try {
             $google_auth_service->generateAuthUrl();
@@ -28,7 +30,7 @@ class GoogleAuthController extends Controller
         catch(Throwable $th) {
             Log::error($th->getMessage(),["trace" => $th->getTrace()]);
             return \response()->json([
-                "error" => "internal error"
+                "error" => self::ERROR_MESSAGE
             ],500);
         }
     }
@@ -39,13 +41,14 @@ class GoogleAuthController extends Controller
      * @param GoogleAuthService $google_auth_service
      * @param UserService $user_service
      * @param UserRepository $user_repository
+     * @return RedirectResponse|JsonResponse
      */
     public function googleCallback(
         Request $request,
         GoogleAuthService $google_auth_service,
         UserService $user_service,
         UserRepository $user_repository
-    ) {
+    ): RedirectResponse|JsonResponse {
         try {
             if($request->exists("error")) return \redirect("http://localhost/");
 
@@ -66,7 +69,7 @@ class GoogleAuthController extends Controller
         catch(Throwable $th) {
             Log::error($th->getMessage(),["trace" => $th->getTrace()]);
             return \response()->json([
-                "error" => "internal error"
+                "error" => self::ERROR_MESSAGE
             ],500);
         }
         

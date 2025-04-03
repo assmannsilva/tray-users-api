@@ -2,17 +2,17 @@
 
 namespace App\Models;
 
-use App\Helpers\SodiumCrypto;
-use Attribute;
+use App\Models\Traits\HasEncrypt;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasEncrypt;
 
     /**
      * The attributes that are mass assignable.
@@ -37,63 +37,19 @@ class User extends Authenticatable
         "google_token",
     ];
 
-    protected function encryptedAttribute(string $column): Attribute
-    {
-        $crypt_key = SodiumCrypto::getCryptKey("app.crypted_user_columns_keys.$column");
-        return Attribute::make(
-            get: fn($value) => $value ? SodiumCrypto::decrypt($value, $crypt_key) : null,
-            set: fn($value) => $value ? SodiumCrypto::encrypt($value, $crypt_key) : null,
-        );
-    }
-
-    protected function encryptCpfIndex(): void
-    {
-        if($this->cpf === \null) return;
-        $crypt_index = SodiumCrypto::getCryptKey("app.crypted_user_columns_keys.cpf_index");
-        $this->attributes["cpf_index"] = SodiumCrypto::getIndex($this->cpf, $crypt_index);
-    }
-
-    protected function encryptFirstNameIndex(): void
-    {
-        if($this->name === \null) return;
-        $crypt_index = SodiumCrypto::getCryptKey("app.crypted_user_columns_keys.name_index");
-        
-        $names = explode(" ", $this->name);
-        $first_name = $names[0];
-
-        $this->attributes["first_name_index"] = SodiumCrypto::getIndex($first_name, $crypt_index);
-    }
-
-    protected function encryptSurnameTokens(): void
-    {
-        if($this->name === \null) return;
-        $crypt_index = SodiumCrypto::getCryptKey("app.crypted_user_columns_keys.name_index");
-
-        $surnames = explode(" ", $this->name);
-        \array_shift($surnames);
-        $surnames_tokens = \array_map(fn($surname) => SodiumCrypto::getIndex($surname, $crypt_index), $surnames);
-        
-        $this->attributes["surname_tokens"] = \json_encode($surnames_tokens);
-    }
-
     protected function cpf(): Attribute
     {
-        return $this->encryptedAttribute('cpf');
+        return Attribute::make(...$this->makeEncryptedAttributeCallables('cpf'));
     }   
 
     protected function name(): Attribute
     {
-        return $this->encryptedAttribute('name');
-    }
-
-    protected function birthday(): Attribute
-    {
-        return $this->encryptedAttribute('birthday');
+        return Attribute::make(...$this->makeEncryptedAttributeCallables('name'));
     }
 
     protected function google_token(): Attribute
     {
-        return $this->encryptedAttribute('google_token');
+        return Attribute::make(...$this->makeEncryptedAttributeCallables('google_token'));
     }
 
 
